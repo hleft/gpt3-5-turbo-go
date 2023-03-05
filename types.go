@@ -1,10 +1,7 @@
 package gpt35
 
-type RoleType string
-type ModelType string
-
-type Request struct {
-	Model            ModelType   `json:"model"`
+type RequestData struct {
+	Model            string      `json:"model"`
 	Messages         []*Message  `json:"messages"`
 	Temperature      float64     `json:"temperature,omitempty"`
 	TopP             float64     `json:"top_p,omitempty"`
@@ -19,34 +16,38 @@ type Request struct {
 }
 
 type Response struct {
-	ID      string    `json:"id"`
-	Object  string    `json:"object"`
-	Created int64     `json:"created"`
-	Choices []*Choice `json:"choices"`
-	Usage   *Usage    `json:"usage"`
-	Error   *Error    `json:"error,omitempty"`
+	ID      string `json:"id"`
+	Object  string `json:"object"`
+	Created int64  `json:"created"`
+	Choices []*struct {
+		Index        int      `json:"index"`
+		Message      *Message `json:"message"`
+		FinishReason string   `json:"finish_reason"`
+	} `json:"choices"`
+	Usage *struct {
+		PromptTokens     int `json:"prompt_tokens"`
+		CompletionTokens int `json:"completion_tokens"`
+		TotalTokens      int `json:"total_tokens"`
+	} `json:"usage"`
+	Error *struct {
+		Message string `json:"message"`
+		Type    string `json:"type"`
+		Param   string `json:"param"`
+		Code    string `json:"code"`
+	} `json:"error,omitempty"`
 }
 
 type Message struct {
-	Role    RoleType `json:"role,omitempty"`
-	Content string   `json:"content"`
+	Role    string `json:"role,omitempty"`
+	Content string `json:"content"`
 }
 
-type Choice struct {
-	Index        int      `json:"index"`
-	Message      *Message `json:"message"`
-	FinishReason string   `json:"finish_reason"`
+func NewSystemMsg(content string) *Message {
+	return &Message{Role: RoleSystem, Content: content}
 }
-
-type Usage struct {
-	PromptTokens     int `json:"prompt_tokens"`
-	CompletionTokens int `json:"completion_tokens"`
-	TotalTokens      int `json:"total_tokens"`
+func NewUserMsg(content string) *Message {
+	return &Message{Role: RoleUser, Content: content}
 }
-
-type Error struct {
-	Message string `json:"message"`
-	Type    string `json:"type"`
-	Param   string `json:"param"`
-	Code    string `json:"code"`
+func NewAssistantMsg(content string) *Message {
+	return &Message{Role: RoleAssistant, Content: content}
 }
