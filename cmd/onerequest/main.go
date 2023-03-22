@@ -14,7 +14,7 @@ func main() {
 		gpt35.ApiKey = os.Getenv("openai_apikey")
 	}
 
-	resp, err := gpt35.SendReq(&gpt35.RequestData{
+	resp, err := gpt35.GetOpenAiResp(&gpt35.RequestData{
 		Model: gpt35.ModelGpt35Turbo,
 		Messages: []*gpt35.Message{
 			gpt35.NewSystemMsg("You are a helpful assistant."),

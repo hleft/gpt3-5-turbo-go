@@ -15,6 +15,20 @@ type RequestData struct {
 	User             string      `json:"user,omitempty"`
 }
 
+type SSEResponse struct {
+	ID      string `json:"id"`
+	Object  string `json:"object"`
+	Created int64  `json:"created"`
+	Model   string `json:"model"`
+	Choices []struct {
+		Delta struct {
+			Content string `json:"content"`
+		} `json:"delta"`
+		Index        int    `json:"index"`
+		FinishReason string `json:"finish_reason"`
+	} `json:"choices"`
+}
+
 type Response struct {
 	ID      string `json:"id"`
 	Object  string `json:"object"`
