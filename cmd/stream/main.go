@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	gpt35 "github.com/hleft/gpt3-5-turbo-go"
+	"github.com/hleft/gpt3-5-turbo-go/gpt35"
 )
 
 func main() {
@@ -14,7 +14,6 @@ func main() {
 	}
 
 	resp, err := gpt35.GetHttpResp(&gpt35.RequestData{
-		Model: gpt35.ModelGpt35Turbo,
 		Messages: []*gpt35.Message{
 			gpt35.NewSystemMsg("You are a helpful assistant."),
 			gpt35.NewUserMsg("Who won the world series in 2020?"),

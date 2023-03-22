@@ -21,6 +21,7 @@ const (
 )
 
 func GetHttpResp(rd *RequestData) (*http.Response, error) {
+	rd.Model = ModelGpt35Turbo
 	req, err := getReq(rd, DefaultUrl)
 	if err != nil {
 		return nil, err
