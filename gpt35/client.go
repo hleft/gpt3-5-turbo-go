@@ -3,6 +3,7 @@ package gpt35
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -20,14 +21,20 @@ const (
 	RoleSystem          = "system"
 )
 
-func GetHttpResp(rd *RequestData) (*http.Response, error) {
+func GetHttpResp(ctx context.Context, rd *RequestData) (*http.Response, error) {
 	rd.Model = ModelGpt35Turbo
 	req, err := getReq(rd, DefaultUrl)
 	if err != nil {
 		return nil, err
 	}
 
+	req = req.WithContext(ctx)
+
 	httpResp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +51,7 @@ func ListenHttpResp(resp *http.Response) (chan SSEResponse, error) {
 		for {
 			line, err := reader.ReadString('\n')
 			if err != nil && err != io.EOF {
-				panic(err)
+				return
 			}
 
 			if err == io.EOF {
@@ -55,16 +62,14 @@ func ListenHttpResp(resp *http.Response) (chan SSEResponse, error) {
 				if strings.TrimSpace(line[6:]) == "[DONE]" {
 					break
 				}
-				var message SSEResponse
+				var msg SSEResponse
 				// delete data:
-				err := json.Unmarshal([]byte(line[6:]), &message)
+				err := json.Unmarshal([]byte(line[6:]), &msg)
 				if err != nil {
 					panic(err)
 				}
 
-				for range message.Choices {
-					messages <- message
-				}
+				messages <- msg
 			}
 		}
 	}()
@@ -72,8 +77,8 @@ func ListenHttpResp(resp *http.Response) (chan SSEResponse, error) {
 	return messages, nil
 }
 
-func GetOpenAiResp(rd *RequestData) (*Response, error) {
-	httpResp, err := GetHttpResp(rd)
+func GetOpenAiResp(ctx context.Context, rd *RequestData) (*Response, error) {
+	httpResp, err := GetHttpResp(ctx, rd)
 	if err != nil {
 		return nil, err
 	}

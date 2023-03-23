@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -13,7 +14,7 @@ func main() {
 		gpt35.ApiKey = os.Getenv("openai_apikey")
 	}
 
-	resp, err := gpt35.GetHttpResp(&gpt35.RequestData{
+	resp, err := gpt35.GetHttpResp(context.Background(), &gpt35.RequestData{
 		Messages: []*gpt35.Message{
 			gpt35.NewSystemMsg("You are a helpful assistant."),
 			gpt35.NewUserMsg("Who won the world series in 2020?"),
